@@ -45,8 +45,8 @@ export default function App() {
         window.location.hash = `#/prompts?id=${blockId}`;
       }
       
-      // Reset pathname cleanly to /
-      window.history.replaceState(null, '', '/');
+      // Reset pathname cleanly to / but preserve the hash we just set
+      window.history.replaceState(null, '', '/' + window.location.hash);
     }
 
     const handleHashChange = () => {

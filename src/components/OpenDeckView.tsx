@@ -11,6 +11,7 @@ interface OpenDeckViewProps {
 
 export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
   const [modalData, setModalData] = useState<any>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkHashForModal = () => {
@@ -117,12 +118,17 @@ export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
                 onClick={(e) => {
                   e.stopPropagation();
                   navigator.clipboard.writeText(`https://opendeck.theshriks.space/${wrapper.id}`);
-                  alert('Share link copied!');
+                  setCopiedId(wrapper.id);
+                  setTimeout(() => setCopiedId(null), 2000);
                 }}
-                className="absolute top-4 right-4 p-1.5 opacity-50 hover:opacity-100 bg-black/20 hover:bg-black/50 rounded transition-all"
+                className="absolute top-4 right-4 p-1.5 opacity-50 hover:opacity-100 bg-black/20 hover:bg-black/50 rounded transition-all z-20"
                 title="Copy Share Link"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                {copiedId === wrapper.id ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                )}
               </button>
             )}
           </div>

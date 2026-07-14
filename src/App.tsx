@@ -23,48 +23,25 @@ import { RESOURCES, SHORTS, COLLECTIONS, TOPICS, ROADMAPS } from './data/archive
 import { Resource } from './types';
 
 export default function App() {
-  const [currentRoute, setCurrentRoute] = useState('#/opendeck');
+  const [currentRoute, setCurrentRoute] = useState(
+    window.location.pathname === '/' || window.location.pathname === '/index.html'
+      ? '/opendeck'
+      : window.location.pathname
+  );
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [bookmarks, setBookmarks] = useState<string[]>([]);
   const [systemTime, setSystemTime] = useState('');
 
-  // 1. Hash Routing System & Deep Linking
+  // 1. History API Routing System
   useEffect(() => {
-    // Handle Vercel Deep Linking (e.g. /wrapper-whichllm)
-    const path = window.location.pathname;
-    if (path && path !== '/' && path !== '/index.html') {
-      const blockId = path.substring(1); // remove leading slash
-      
-      // Determine target view
-      if (blockId.startsWith('wrapper-')) {
-        window.location.hash = `#/opendeck?id=${blockId}`;
-      } else if (blockId.startsWith('mat-') || blockId.startsWith('note-')) {
-        window.location.hash = `#/materials?id=${blockId}`;
-      } else if (blockId.startsWith('prompt-')) {
-        window.location.hash = `#/prompts?id=${blockId}`;
-      }
-      
-      // Reset pathname cleanly to / but preserve the hash we just set
-      window.history.replaceState(null, '', '/' + window.location.hash);
-    }
-
-    const handleHashChange = () => {
-      // Remove query params for state route matching if needed, but we keep it simple here
-      const fullHash = window.location.hash || '#/opendeck';
-      setCurrentRoute(fullHash.split('?')[0]);
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      setCurrentRoute(path === '/' || path === '/index.html' ? '/opendeck' : path);
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    
-    // Set initial hash
-    if (!window.location.hash) {
-      window.location.hash = '#/opendeck';
-    } else {
-      handleHashChange();
-    }
-
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   // 2. Real-time system clock
@@ -103,7 +80,9 @@ export default function App() {
   };
 
   const handleNavigate = (route: string) => {
-    window.location.hash = route;
+    window.history.pushState(null, '', route);
+    setCurrentRoute(route);
+    window.scrollTo(0, 0);
   };
 
   // Keyboard shortcut for command palette (Ctrl+K or Command+K or /)
@@ -135,19 +114,19 @@ export default function App() {
 
   // Route router logic helper
   const renderCurrentView = () => {
-    if (currentRoute.startsWith('#/materials')) {
-      return <MaterialsView isDarkMode={isDarkMode} />;
+    if (currentRoute.startsWith('/materials') || currentRoute.startsWith('/mat-') || currentRoute.startsWith('/note-')) {
+      return <MaterialsView isDarkMode={isDarkMode} currentRoute={currentRoute} onNavigate={handleNavigate} />;
     }
-    if (currentRoute.startsWith('#/prompts')) {
-      return <PromptsView isDarkMode={isDarkMode} />;
+    if (currentRoute.startsWith('/prompts') || currentRoute.startsWith('/prompt-')) {
+      return <PromptsView isDarkMode={isDarkMode} currentRoute={currentRoute} onNavigate={handleNavigate} />;
     }
-    if (currentRoute === '#/opendeck') {
-      return <OpenDeckView isDarkMode={isDarkMode} />;
+    if (currentRoute === '/opendeck' || currentRoute.startsWith('/wrapper-')) {
+      return <OpenDeckView isDarkMode={isDarkMode} currentRoute={currentRoute} onNavigate={handleNavigate} />;
     }
 
-    // 1. Resource detail route: #/resources/:id
-    if (currentRoute.startsWith('#/resources/')) {
-      const resourceId = currentRoute.replace('#/resources/', '');
+    // 1. Resource detail route: /resources/:id
+    if (currentRoute.startsWith('/resources/')) {
+      const resourceId = currentRoute.replace('/resources/', '');
       const resource = RESOURCES.find((r) => r.id === resourceId);
       if (resource) {
         return (
@@ -162,9 +141,9 @@ export default function App() {
       }
     }
 
-    // 2. Short detail route: #/shorts/:id or general #/shorts
-    if (currentRoute.startsWith('#/shorts')) {
-      const shortId = currentRoute.startsWith('#/shorts/') ? currentRoute.replace('#/shorts/', '') : undefined;
+    // 2. Short detail route: /shorts/:id or general /shorts
+    if (currentRoute.startsWith('/shorts')) {
+      const shortId = currentRoute.startsWith('/shorts/') ? currentRoute.replace('/shorts/', '') : undefined;
       return (
         <ShortsViewer
           initialShortId={shortId}
@@ -174,9 +153,9 @@ export default function App() {
       );
     }
 
-    // 3. Topics route: #/topics/:id or general #/topics
-    if (currentRoute.startsWith('#/topics')) {
-      const topicId = currentRoute.startsWith('#/topics/') ? currentRoute.replace('#/topics/', '') : undefined;
+    // 3. Topics route: /topics/:id or general /topics
+    if (currentRoute.startsWith('/topics')) {
+      const topicId = currentRoute.startsWith('/topics/') ? currentRoute.replace('/topics/', '') : undefined;
       return (
         <TopicExplorer
           initialTopicId={topicId}
@@ -186,9 +165,9 @@ export default function App() {
       );
     }
 
-    // 4. Roadmaps route: #/roadmaps/:id or general #/roadmaps
-    if (currentRoute.startsWith('#/roadmaps')) {
-      const roadmapId = currentRoute.startsWith('#/roadmaps/') ? currentRoute.replace('#/roadmaps/', '') : undefined;
+    // 4. Roadmaps route: /roadmaps/:id or general /roadmaps
+    if (currentRoute.startsWith('/roadmaps')) {
+      const roadmapId = currentRoute.startsWith('/roadmaps/') ? currentRoute.replace('/roadmaps/', '') : undefined;
       return (
         <RoadmapViewer
           initialRoadmapId={roadmapId}
@@ -198,9 +177,9 @@ export default function App() {
       );
     }
 
-    // 5. Collections route: #/collections/:id
-    if (currentRoute.startsWith('#/collections/')) {
-      const collectionId = currentRoute.replace('#/collections/', '');
+    // 5. Collections route: /collections/:id
+    if (currentRoute.startsWith('/collections/')) {
+      const collectionId = currentRoute.replace('/collections/', '');
       const collection = COLLECTIONS.find((c) => c.id === collectionId);
       if (collection) {
         // Render collection playlist details
@@ -224,7 +203,7 @@ export default function App() {
                   <button
                     id={`collection-item-${res.id}`}
                     key={res.id}
-                    onClick={() => handleNavigate(`#/resources/${res.id}`)}
+                    onClick={() => handleNavigate(`/resources/${res.id}`)}
                     className={`w-full text-left p-5 border transition-all flex items-start space-x-4 hover:scale-[1.01] ${
                       isDarkMode
                         ? 'border-neutral-800 hover:border-neutral-500 bg-neutral-950/20'
@@ -255,8 +234,8 @@ export default function App() {
       }
     }
 
-    // 6. Library view: #/library
-    if (currentRoute === '#/library') {
+    // 6. Library view: /library
+    if (currentRoute === '/library') {
       return (
         <div id="library-container" className="max-w-7xl mx-auto px-4 md:px-8 py-8 font-mono">
           <div className="border-b pb-4 mb-8">
@@ -274,7 +253,7 @@ export default function App() {
               <button
                 id={`library-card-${res.id}`}
                 key={res.id}
-                onClick={() => handleNavigate(`#/resources/${res.id}`)}
+                onClick={() => handleNavigate(`/resources/${res.id}`)}
                 className={`text-left p-5 border transition-all flex flex-col justify-between hover:scale-[1.01] ${
                   isDarkMode
                     ? 'border-neutral-800 hover:border-neutral-500 bg-neutral-950/20'
@@ -305,8 +284,8 @@ export default function App() {
       );
     }
 
-    // 7. Bookmarks view: #/bookmarks
-    if (currentRoute === '#/bookmarks') {
+    // 7. Bookmarks view: /bookmarks
+    if (currentRoute === '/bookmarks') {
       const bookmarkedResources = RESOURCES.filter((r) => bookmarks.includes(r.id));
       return (
         <div id="bookmarks-container" className="max-w-7xl mx-auto px-4 md:px-8 py-8 font-mono">
@@ -338,7 +317,7 @@ export default function App() {
                     <span className="text-[8px] opacity-40 block">NODE::{res.type.toUpperCase()}</span>
                     <button
                       id={`bookmark-title-btn-${res.id}`}
-                      onClick={() => handleNavigate(`#/resources/${res.id}`)}
+                      onClick={() => handleNavigate(`/resources/${res.id}`)}
                       className={`text-xs font-bold tracking-tight text-left block truncate hover:underline mt-1 ${isDarkMode ? 'text-white' : 'text-black'}`}
                     >
                       {res.title}
@@ -359,8 +338,8 @@ export default function App() {
       );
     }
 
-    // 8. About page: #/about
-    if (currentRoute === '#/about') {
+    // 8. About page: /about
+    if (currentRoute === '/about') {
       return (
         <div id="about-container" className="max-w-3xl mx-auto px-4 md:px-8 py-8 font-mono">
           <div className="border-b pb-4 mb-8">
@@ -398,7 +377,7 @@ export default function App() {
       );
     }
 
-    // Default: Home View (#/home)
+    // Default: Home View (/home)
     return (
       <div id="home-view-container" className="max-w-7xl mx-auto px-4 md:px-8 py-8 font-mono space-y-12">
         
@@ -426,7 +405,7 @@ export default function App() {
               <div className="flex flex-wrap gap-4 pt-4">
                 <button
                   id="home-open-reel-workspace"
-                  onClick={() => handleNavigate('#/shorts/how-cpu-cache-works-short')}
+                  onClick={() => handleNavigate('/shorts/how-cpu-cache-works-short')}
                   className={`px-4 py-2 text-xs font-bold tracking-wider border flex items-center space-x-2 transition-all ${
                     isDarkMode
                       ? 'bg-white text-black border-white hover:bg-neutral-200'
@@ -438,7 +417,7 @@ export default function App() {
                 </button>
                 <button
                   id="home-read-cache-article"
-                  onClick={() => handleNavigate('#/resources/cpu-cache-l1-l2-l3')}
+                  onClick={() => handleNavigate('/resources/cpu-cache-l1-l2-l3')}
                   className={`px-4 py-2 text-xs font-bold tracking-wider border transition-all ${
                     isDarkMode
                       ? 'border-neutral-800 text-white hover:bg-neutral-900'
@@ -476,7 +455,7 @@ export default function App() {
               <button
                 id={`home-collection-card-${col.id}`}
                 key={col.id}
-                onClick={() => handleNavigate(`#/collections/${col.id}`)}
+                onClick={() => handleNavigate(`/collections/${col.id}`)}
                 className={`text-left p-5 border transition-all flex flex-col justify-between hover:scale-[1.01] ${
                   isDarkMode
                     ? 'border-neutral-800 hover:border-neutral-500 bg-neutral-950/20'
@@ -520,7 +499,7 @@ export default function App() {
               <button
                 id={`home-topic-node-${topic.id}`}
                 key={topic.id}
-                onClick={() => handleNavigate(`#/topics/${topic.id}`)}
+                onClick={() => handleNavigate(`/topics/${topic.id}`)}
                 className={`p-4 border text-left transition-colors flex flex-col justify-between ${
                   isDarkMode
                     ? 'border-neutral-800 bg-neutral-950/20 hover:border-neutral-500 hover:bg-neutral-900'
@@ -552,7 +531,7 @@ export default function App() {
               <button
                 id={`home-pick-card-${res.id}`}
                 key={res.id}
-                onClick={() => handleNavigate(`#/resources/${res.id}`)}
+                onClick={() => handleNavigate(`/resources/${res.id}`)}
                 className={`text-left p-5 border transition-all flex flex-col justify-between hover:scale-[1.01] ${
                   isDarkMode
                     ? 'border-neutral-800 hover:border-neutral-500 bg-neutral-950/20'
@@ -611,7 +590,7 @@ export default function App() {
                   <span className="text-[9px] opacity-40">{r.steps.length} SYLLABUS_STEPS</span>
                   <button
                     id={`home-roadmap-open-btn-${r.id}`}
-                    onClick={() => handleNavigate(`#/roadmaps/${r.id}`)}
+                    onClick={() => handleNavigate(`/roadmaps/${r.id}`)}
                     className={`px-3 py-1.5 text-[9px] border font-bold transition-colors ${
                       isDarkMode
                         ? 'border-neutral-800 hover:bg-neutral-900 text-white'
@@ -690,7 +669,7 @@ export default function App() {
 
             <button
               id="home-open-tool-btn"
-              onClick={() => handleNavigate(`#/resources/${RESOURCES[6].id}`)}
+              onClick={() => handleNavigate(`/resources/${RESOURCES[6].id}`)}
               className={`px-4 py-2 text-[10px] font-bold tracking-widest border transition-colors ${
                 isDarkMode
                   ? 'border-neutral-800 hover:bg-neutral-900 text-white'
@@ -771,7 +750,7 @@ export default function App() {
       </main>
 
       {/* Newsletter Panel Section */}
-      {(currentRoute === '#/opendeck' || currentRoute === '#/home' || currentRoute === '#/library') && (
+      {(currentRoute === '/opendeck' || currentRoute === '/home' || currentRoute === '/library') && (
         <div className="max-w-7xl mx-auto px-4 md:px-8 pb-12 w-full">
           <NewsletterPanel isDarkMode={isDarkMode} />
         </div>

@@ -187,7 +187,7 @@ export default function RoadmapViewer({
 
                   <button
                     id="roadmap-inspector-open-article"
-                    onClick={() => onNavigate(`#/resources/${selectedStep.resourceId}`)}
+                    onClick={() => onNavigate(`/resources/${selectedStep.resourceId}`)}
                     className={`w-full mt-4 py-2 border text-[10px] tracking-widest font-bold transition-all text-center flex items-center justify-center space-x-1.5 ${
                       isDarkMode
                         ? 'border-neutral-800 hover:border-neutral-500 hover:bg-neutral-900 text-white'

@@ -40,11 +40,11 @@ export default function TopicExplorer({
   };
 
   const handleSelectTopic = (topic: Topic) => {
-    onNavigate(`#/topics/${topic.id}`);
+    onNavigate(`/topics/${topic.id}`);
   };
 
   const handleBack = () => {
-    onNavigate('#/topics');
+    onNavigate('/topics');
   };
 
   return (
@@ -159,7 +159,7 @@ export default function TopicExplorer({
                     <button
                       id={`topic-res-${res.id}`}
                       key={res.id}
-                      onClick={() => onNavigate(`#/resources/${res.id}`)}
+                      onClick={() => onNavigate(`/resources/${res.id}`)}
                       className={`w-full text-left p-3 border text-xs hover:border-current transition-colors flex flex-col justify-between ${
                         isDarkMode ? 'border-neutral-800 bg-neutral-950/40 text-neutral-300' : 'border-neutral-200 bg-neutral-50/50 text-neutral-700'
                       }`}

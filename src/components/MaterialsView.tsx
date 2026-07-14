@@ -5,49 +5,44 @@ import { useEffect, useState } from 'react';
 
 interface MaterialsViewProps {
   isDarkMode: boolean;
+  currentRoute: string;
+  onNavigate: (route: string) => void;
 }
 
-export default function MaterialsView({ isDarkMode }: MaterialsViewProps) {
+export default function MaterialsView({ isDarkMode, currentRoute, onNavigate }: MaterialsViewProps) {
   const [modalData, setModalData] = useState<any>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkHashForModal = () => {
-      const params = new URLSearchParams(window.location.hash.split('?')[1]);
-      const id = params.get('id');
-      if (id) {
-        // Check NOTES first
-        const note = NOTES.find(n => n.id === id);
-        if (note) {
-          setModalData({
-            title: note.title,
-            type: note.type,
-            description: note.description,
-            content: note.content
-          });
-          return;
-        }
-        // Check MATERIALS
-        const material = MATERIALS.find(m => m.id === id);
-        if (material) {
-          setModalData({
-            title: material.title,
-            type: material.type,
-            description: material.description,
-            actionLabel: 'DOWNLOAD FILE',
-            actionUrl: material.link,
-            content: `Size: ${material.size}\nFormat: ${material.type}\nStatus: SECURE`
-          });
-        }
-      } else {
-        setModalData(null);
+    const id = currentRoute.startsWith('/mat-') || currentRoute.startsWith('/note-') ? currentRoute.substring(1) : null;
+    if (id) {
+      // Check NOTES first
+      const note = NOTES.find(n => n.id === id);
+      if (note) {
+        setModalData({
+          title: note.title,
+          type: note.type,
+          description: note.description,
+          content: note.content
+        });
+        return;
       }
-    };
-
-    checkHashForModal();
-    window.addEventListener('hashchange', checkHashForModal);
-    return () => window.removeEventListener('hashchange', checkHashForModal);
-  }, []);
+      // Check MATERIALS
+      const material = MATERIALS.find(m => m.id === id);
+      if (material) {
+        setModalData({
+          title: material.title,
+          type: material.type,
+          description: material.description,
+          actionLabel: 'DOWNLOAD FILE',
+          actionUrl: material.link,
+          content: `Size: ${material.size}\nFormat: ${material.type}\nStatus: SECURE`
+        });
+      }
+    } else {
+      setModalData(null);
+    }
+  }, [currentRoute]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 font-mono">
@@ -195,7 +190,7 @@ export default function MaterialsView({ isDarkMode }: MaterialsViewProps) {
         isOpen={!!modalData}
         onClose={() => {
           setModalData(null);
-          window.location.hash = '#/materials';
+          onNavigate('/materials');
         }}
         isDarkMode={isDarkMode}
         {...modalData}

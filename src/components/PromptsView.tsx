@@ -5,36 +5,31 @@ import DetailsModal from './DetailsModal';
 
 interface PromptsViewProps {
   isDarkMode: boolean;
+  currentRoute: string;
+  onNavigate: (route: string) => void;
 }
 
-export default function PromptsView({ isDarkMode }: PromptsViewProps) {
+export default function PromptsView({ isDarkMode, currentRoute, onNavigate }: PromptsViewProps) {
   const [modalData, setModalData] = useState<any>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkHashForModal = () => {
-      const params = new URLSearchParams(window.location.hash.split('?')[1]);
-      const id = params.get('id');
-      if (id) {
-        const prompt = PROMPTS.find(p => p.id === id);
-        if (prompt) {
-          setModalData({
-            title: prompt.title,
-            type: prompt.category,
-            description: prompt.description,
-            actionLabel: 'COPY PROMPT',
-            content: prompt.content
-          });
-        }
-      } else {
-        setModalData(null);
+    const id = currentRoute.startsWith('/prompt-') ? currentRoute.substring(1) : null;
+    if (id) {
+      const prompt = PROMPTS.find(p => p.id === id);
+      if (prompt) {
+        setModalData({
+          title: prompt.title,
+          type: prompt.category,
+          description: prompt.description,
+          actionLabel: 'COPY PROMPT',
+          content: prompt.content
+        });
       }
-    };
-
-    checkHashForModal();
-    window.addEventListener('hashchange', checkHashForModal);
-    return () => window.removeEventListener('hashchange', checkHashForModal);
-  }, []);
+    } else {
+      setModalData(null);
+    }
+  }, [currentRoute]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 font-mono">
@@ -117,7 +112,7 @@ export default function PromptsView({ isDarkMode }: PromptsViewProps) {
         isOpen={!!modalData}
         onClose={() => {
           setModalData(null);
-          window.location.hash = '#/prompts';
+          onNavigate('/prompts');
         }}
         isDarkMode={isDarkMode}
         {...modalData}

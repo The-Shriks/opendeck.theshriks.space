@@ -36,7 +36,7 @@ export default function ResourceViewer({
   };
 
   const handleShare = () => {
-    const shareUrl = `${window.location.origin}${window.location.pathname}#/resources/${resource.id}`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}/resources/${resource.id}`;
     navigator.clipboard.writeText(shareUrl);
     setShowShareNotification(true);
     setTimeout(() => setShowShareNotification(false), 2500);
@@ -229,7 +229,7 @@ export default function ResourceViewer({
       <div className="mb-6 flex justify-between items-center">
         <button
           id="back-to-library-btn"
-          onClick={() => onNavigate('#/library')}
+          onClick={() => onNavigate('/library')}
           className={`flex items-center space-x-1 text-xs font-mono tracking-widest ${
             isDarkMode ? 'text-neutral-400 hover:text-white' : 'text-neutral-600 hover:text-black'
           }`}
@@ -360,7 +360,7 @@ export default function ResourceViewer({
               <button
                 id={`related-card-${rel.id}`}
                 key={rel.id}
-                onClick={() => onNavigate(`#/resources/${rel.id}`)}
+                onClick={() => onNavigate(`/resources/${rel.id}`)}
                 className={`text-left p-4 border transition-all flex flex-col justify-between hover:scale-[1.01] ${
                   isDarkMode 
                     ? 'border-neutral-800 hover:border-neutral-600 bg-neutral-950/20' 

@@ -63,7 +63,7 @@ export default function Footer({ isDarkMode }: FooterProps) {
             </a>
             <a
               id="footer-link-rss"
-              href="#/rss"
+              href="/rss"
               className="flex items-center space-x-1 hover:text-white transition-colors"
             >
               <Rss size={12} />

@@ -97,7 +97,7 @@ Make sure to expose port 80 and set up the necessary environment variables for y
     id: 'note-arch-decisions',
     title: 'Why we chose Hash Routing',
     description: 'An architectural decision record (ADR) explaining the use of hash routing over browser router.',
-    content: `In the Developer Archive (now OpenDeck) architecture, we opted for Hash Routing (#/route) instead of the standard Browser History API.
+    content: `In the Developer Archive (now OpenDeck) architecture, we opted for Hash Routing (/route) instead of the standard Browser History API.
 
 Reasoning:
 1. Static Hosting: The application is designed to be hosted anywhere without server-side rewrite rules.

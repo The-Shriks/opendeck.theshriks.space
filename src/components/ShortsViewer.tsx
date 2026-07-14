@@ -240,7 +240,7 @@ export default function ShortsViewer({
                   <button
                     id={`short-ref-${resId}`}
                     key={resId}
-                    onClick={() => onNavigate(`#/resources/${resId}`)}
+                    onClick={() => onNavigate(`/resources/${resId}`)}
                     className={`w-full text-left p-2.5 border text-xs hover:border-current transition-colors flex items-center justify-between ${
                       isDarkMode ? 'border-neutral-800 text-neutral-300' : 'border-neutral-200 text-neutral-700'
                     }`}

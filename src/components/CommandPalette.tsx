@@ -40,7 +40,7 @@ export default function CommandPalette({
       description: r.description,
       type: r.type === 'cheat-sheet' ? 'cheat-sheet' : r.type === 'tool' ? 'tool' : r.type === 'prompt' ? 'prompt' : 'article',
       category: r.type.toUpperCase(),
-      route: `#/resources/${r.id}`
+      route: `/resources/${r.id}`
     })),
     // Shorts
     ...SHORTS.map((s): SearchResult => ({
@@ -49,7 +49,7 @@ export default function CommandPalette({
       description: s.description,
       type: 'short',
       category: 'INSTAGRAM REEL',
-      route: `#/shorts/${s.id}`
+      route: `/shorts/${s.id}`
     })),
     // Collections
     ...COLLECTIONS.map((c): SearchResult => ({
@@ -58,7 +58,7 @@ export default function CommandPalette({
       description: c.description,
       type: 'collection',
       category: 'COLLECTION',
-      route: `#/collections/${c.id}`
+      route: `/collections/${c.id}`
     })),
     // Topics
     ...TOPICS.map((t): SearchResult => ({
@@ -67,7 +67,7 @@ export default function CommandPalette({
       description: t.overview,
       type: 'topic',
       category: 'TOPIC',
-      route: `#/topics/${t.id}`
+      route: `/topics/${t.id}`
     })),
     // Roadmaps
     ...ROADMAPS.map((r): SearchResult => ({
@@ -76,7 +76,7 @@ export default function CommandPalette({
       description: r.description,
       type: 'roadmap',
       category: 'ROADMAP',
-      route: `#/roadmaps/${r.id}`
+      route: `/roadmaps/${r.id}`
     }))
   ];
 

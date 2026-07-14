@@ -31,15 +31,15 @@ export default function Navigation({
   }, []);
 
   const navItems = [
-    { label: 'OPENDECK', route: '#/opendeck' },
-    { label: 'MATERIALS', route: '#/materials' },
-    { label: 'PROMPTS', route: '#/prompts' }
+    { label: 'OPENDECK', route: '/opendeck' },
+    { label: 'MATERIALS', route: '/materials' },
+    { label: 'PROMPTS', route: '/prompts' }
   ];
 
   const getActiveItem = () => {
-    if (currentRoute.startsWith('#/opendeck')) return '#/opendeck';
-    if (currentRoute.startsWith('#/materials')) return '#/materials';
-    if (currentRoute.startsWith('#/prompts')) return '#/prompts';
+    if (currentRoute.startsWith('/opendeck')) return '/opendeck';
+    if (currentRoute.startsWith('/materials')) return '/materials';
+    if (currentRoute.startsWith('/prompts')) return '/prompts';
     return currentRoute;
   };
 
@@ -63,7 +63,7 @@ export default function Navigation({
         <button
           id="nav-logo-btn"
           onClick={() => {
-            onNavigate('#/opendeck');
+            onNavigate('/opendeck');
             setIsMobileMenuOpen(false);
           }}
           className="flex items-center space-x-2 font-mono font-semibold tracking-wider text-sm hover:opacity-80 transition-opacity"

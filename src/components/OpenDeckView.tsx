@@ -7,37 +7,32 @@ import { useEffect } from 'react';
 
 interface OpenDeckViewProps {
   isDarkMode: boolean;
+  currentRoute: string;
+  onNavigate: (route: string) => void;
 }
 
-export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
+export default function OpenDeckView({ isDarkMode, currentRoute, onNavigate }: OpenDeckViewProps) {
   const [modalData, setModalData] = useState<any>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkHashForModal = () => {
-      const params = new URLSearchParams(window.location.hash.split('?')[1]);
-      const id = params.get('id');
-      if (id) {
-        const wrapper = WRAPPERS.find(w => w.id === id);
-        if (wrapper && wrapper.locked === false) {
-          setModalData({
-            title: wrapper.name,
-            type: wrapper.type,
-            description: wrapper.description,
-            actionLabel: 'VISIT GITHUB REPO',
-            actionUrl: wrapper.url,
-            content: wrapper.content || `Stars: ${wrapper.stars}\nPackage Status: NPM_READY\nLicense: MIT_OPEN_SOURCE\n\nExecute npm install for integration.`
-          });
-        }
-      } else {
-        setModalData(null);
+    const id = currentRoute.startsWith('/wrapper-') ? currentRoute.substring(1) : null;
+    if (id) {
+      const wrapper = WRAPPERS.find(w => w.id === id);
+      if (wrapper && wrapper.locked === false) {
+        setModalData({
+          title: wrapper.name,
+          type: wrapper.type,
+          description: wrapper.description,
+          actionLabel: 'VISIT GITHUB REPO',
+          actionUrl: wrapper.url,
+          content: wrapper.content || `Stars: ${wrapper.stars}\nPackage Status: NPM_READY\nLicense: MIT_OPEN_SOURCE\n\nExecute npm install for integration.`
+        });
       }
-    };
-
-    checkHashForModal();
-    window.addEventListener('hashchange', checkHashForModal);
-    return () => window.removeEventListener('hashchange', checkHashForModal);
-  }, []);
+    } else {
+      setModalData(null);
+    }
+  }, [currentRoute]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 font-mono">
@@ -57,14 +52,7 @@ export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
             key={wrapper.id}
             onClick={() => {
               if (wrapper.locked === false) {
-                setModalData({
-                  title: wrapper.name,
-                  type: wrapper.type,
-                  description: wrapper.description,
-                  actionLabel: 'VISIT GITHUB REPO',
-                  actionUrl: wrapper.url,
-                  content: wrapper.content || `Stars: ${wrapper.stars}\nPackage Status: NPM_READY\nLicense: MIT_OPEN_SOURCE\n\nExecute npm install for integration.`
-                });
+                onNavigate(`/${wrapper.id}`);
               }
             }}
             className={`relative group w-full text-left p-6 border transition-all flex flex-col justify-between overflow-hidden ${
@@ -139,7 +127,7 @@ export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
         isOpen={!!modalData}
         onClose={() => {
           setModalData(null);
-          window.location.hash = '#/opendeck'; // reset hash
+          onNavigate('/opendeck');
         }}
         isDarkMode={isDarkMode}
         {...modalData}

@@ -11,33 +11,41 @@ export default function MaterialsView({ isDarkMode }: MaterialsViewProps) {
   const [modalData, setModalData] = useState<any>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
-    const id = params.get('id');
-    if (id) {
-      // Check NOTES first
-      const note = NOTES.find(n => n.id === id);
-      if (note) {
-        setModalData({
-          title: note.title,
-          type: note.type,
-          description: note.description,
-          content: note.content
-        });
-        return;
+    const checkHashForModal = () => {
+      const params = new URLSearchParams(window.location.hash.split('?')[1]);
+      const id = params.get('id');
+      if (id) {
+        // Check NOTES first
+        const note = NOTES.find(n => n.id === id);
+        if (note) {
+          setModalData({
+            title: note.title,
+            type: note.type,
+            description: note.description,
+            content: note.content
+          });
+          return;
+        }
+        // Check MATERIALS
+        const material = MATERIALS.find(m => m.id === id);
+        if (material) {
+          setModalData({
+            title: material.title,
+            type: material.type,
+            description: material.description,
+            actionLabel: 'DOWNLOAD FILE',
+            actionUrl: material.link,
+            content: `Size: ${material.size}\nFormat: ${material.type}\nStatus: SECURE`
+          });
+        }
+      } else {
+        setModalData(null);
       }
-      // Check MATERIALS
-      const material = MATERIALS.find(m => m.id === id);
-      if (material) {
-        setModalData({
-          title: material.title,
-          type: material.type,
-          description: material.description,
-          actionLabel: 'DOWNLOAD FILE',
-          actionUrl: material.link,
-          content: `Size: ${material.size}\nFormat: ${material.type}\nStatus: SECURE`
-        });
-      }
-    }
+    };
+
+    checkHashForModal();
+    window.addEventListener('hashchange', checkHashForModal);
+    return () => window.removeEventListener('hashchange', checkHashForModal);
   }, []);
 
   return (

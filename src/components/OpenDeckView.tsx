@@ -13,21 +13,29 @@ export default function OpenDeckView({ isDarkMode }: OpenDeckViewProps) {
   const [modalData, setModalData] = useState<any>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
-    const id = params.get('id');
-    if (id) {
-      const wrapper = WRAPPERS.find(w => w.id === id);
-      if (wrapper && wrapper.locked === false) {
-        setModalData({
-          title: wrapper.name,
-          type: wrapper.type,
-          description: wrapper.description,
-          actionLabel: 'VISIT GITHUB REPO',
-          actionUrl: wrapper.url,
-          content: wrapper.content || `Stars: ${wrapper.stars}\nPackage Status: NPM_READY\nLicense: MIT_OPEN_SOURCE\n\nExecute npm install for integration.`
-        });
+    const checkHashForModal = () => {
+      const params = new URLSearchParams(window.location.hash.split('?')[1]);
+      const id = params.get('id');
+      if (id) {
+        const wrapper = WRAPPERS.find(w => w.id === id);
+        if (wrapper && wrapper.locked === false) {
+          setModalData({
+            title: wrapper.name,
+            type: wrapper.type,
+            description: wrapper.description,
+            actionLabel: 'VISIT GITHUB REPO',
+            actionUrl: wrapper.url,
+            content: wrapper.content || `Stars: ${wrapper.stars}\nPackage Status: NPM_READY\nLicense: MIT_OPEN_SOURCE\n\nExecute npm install for integration.`
+          });
+        }
+      } else {
+        setModalData(null);
       }
-    }
+    };
+
+    checkHashForModal();
+    window.addEventListener('hashchange', checkHashForModal);
+    return () => window.removeEventListener('hashchange', checkHashForModal);
   }, []);
 
   return (

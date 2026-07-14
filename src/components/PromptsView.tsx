@@ -11,20 +11,28 @@ export default function PromptsView({ isDarkMode }: PromptsViewProps) {
   const [modalData, setModalData] = useState<any>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.hash.split('?')[1]);
-    const id = params.get('id');
-    if (id) {
-      const prompt = PROMPTS.find(p => p.id === id);
-      if (prompt) {
-        setModalData({
-          title: prompt.title,
-          type: prompt.category,
-          description: prompt.description,
-          actionLabel: 'COPY PROMPT',
-          content: prompt.content
-        });
+    const checkHashForModal = () => {
+      const params = new URLSearchParams(window.location.hash.split('?')[1]);
+      const id = params.get('id');
+      if (id) {
+        const prompt = PROMPTS.find(p => p.id === id);
+        if (prompt) {
+          setModalData({
+            title: prompt.title,
+            type: prompt.category,
+            description: prompt.description,
+            actionLabel: 'COPY PROMPT',
+            content: prompt.content
+          });
+        }
+      } else {
+        setModalData(null);
       }
-    }
+    };
+
+    checkHashForModal();
+    window.addEventListener('hashchange', checkHashForModal);
+    return () => window.removeEventListener('hashchange', checkHashForModal);
   }, []);
 
   return (

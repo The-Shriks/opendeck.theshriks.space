@@ -1,0 +1,6 @@
+{
+  "name": "The Developer Archive",
+  "description": "An immersive digital knowledge environment and professional engineering workspace for curated articles, system design roadmaps, cheat sheets, and source code.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
